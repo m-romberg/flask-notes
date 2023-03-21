@@ -9,25 +9,39 @@ class RegisterUserForm(FlaskForm):
 
     username = StringField(
         "Username",
-        validators=[InputRequired(message="Please enter a username.")]
+        validators=[InputRequired()]
     )
 
     password = PasswordField(
         "Password",
-        validators=[InputRequired(message="Please enter a password.")]
+        validators=[InputRequired()]
     )
     email = StringField(
         "Email",
         validators=[
-            InputRequired(message="Please enter an email.")]
+            InputRequired()]
     )
 
     first_name = StringField(
         "First Name",
-        validators=[InputRequired(message="Please enter a first name.")]
+        validators=[InputRequired()]
     )
 
     last_name = StringField(
         "Last Name",
-        validators=[InputRequired(message="Please enter a last name.")]
+        validators=[InputRequired()]
+    )
+
+
+class LoginForm(FlaskForm):
+    """From to login"""
+
+    username = StringField(
+        "Username",
+        validators=[InputRequired()]
+    )
+
+    password = PasswordField(
+        "Password",
+        validators=[InputRequired()]
     )

@@ -75,3 +75,9 @@ class User(db.Model):
             return u
         else:
             return False
+
+    @property
+    def full_name(self):
+        """Return full name of user."""
+
+        return f"{self.first_name} {self.last_name}"
