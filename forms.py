@@ -18,8 +18,7 @@ class RegisterUserForm(FlaskForm):
     )
     email = StringField(
         "Email",
-        validators=[
-            InputRequired()]
+        validators=[InputRequired()] #TODO: install email_validator into venv
     )
 
     first_name = StringField(
@@ -45,6 +44,7 @@ class LoginForm(FlaskForm):
         "Password",
         validators=[InputRequired()]
     )
+
 
 class CSRFProtectForm(FlaskForm):
     """Form just for CSRF protection"""

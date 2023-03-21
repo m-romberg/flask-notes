@@ -81,3 +81,31 @@ class User(db.Model):
         """Return full name of user."""
 
         return f"{self.first_name} {self.last_name}"
+
+class Note(db.Model):
+    """Note."""
+
+    __tablename__ = "notes"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+        autoincrement=True
+    )
+
+    title = db.Column(
+        db.String(100),
+        nullable=False
+    )
+
+    content = db.Column(
+        db.Text,
+        nullable=False
+    )
+
+    owner = db.Column(
+        db.String(20),
+        db.ForeignKey("users.username"),
+        nullable=False
+    )
+

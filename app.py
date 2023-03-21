@@ -1,6 +1,7 @@
 import os
 
-from flask import Flask, request, redirect, render_template, flash, session
+from flask import Flask, redirect, render_template, flash, session
+from werkzeug.exceptions import Unauthorized
 from flask_debugtoolbar import DebugToolbarExtension
 
 
@@ -68,11 +69,11 @@ def register_new_user():
 def login():
     """Get form to login and handle login attempts"""
 
-    form = LoginForm()
-
     if "username" in session:
         username = session["username"]
         return redirect(f'/users/{username}')
+
+    form = LoginForm()
 
     if form.validate_on_submit():
         username = form.username.data
@@ -89,7 +90,7 @@ def login():
             form.username.errors = ["Invalid username/password combination."]
             return render_template("login.html", form=form)
 
-    else:
+    else: #TODO: omit and dedent
         return render_template("login.html", form=form)
 
 
@@ -97,16 +98,16 @@ def login():
 def display_user(username):
     """Display the user detail page if user is logged in or redirect to root"""
 
-    form = CSRFProtectForm()
-
-    user = User.query.get_or_404(username)
 
     if "username" not in session or session['username'] != username:
         flash(f"Sorry, only {username} may access this page.")
+        #TODO: raise unauthorized() instead of flashing and redirecting
         return redirect("/")
 
-    else:
-        return render_template("user_details.html", user=user, form=form)
+    form = CSRFProtectForm()
+    user = User.query.get_or_404(username)
+
+    return render_template("user_details.html", user=user, form=form)
 
 @app.post('/logout')
 def logout():
@@ -116,5 +117,26 @@ def logout():
 
     if form.validate_on_submit():
         session.pop("username", None)
+    #TODO: raise an unauthorized error here
+    # Import unauthorized error
+        return redirect("/")
+    else:
+        raise Unauthorized()
 
-    return redirect("/")
+
+###################################Notes Routes#################################
+
+# @app.get('/users/<username>')
+# def display_user(username):
+#     """Display the user detail page if user is logged in or redirect to root"""
+
+#     form = CSRFProtectForm()
+
+#     user = User.query.get_or_404(username)
+
+#     if "username" not in session or session['username'] != username:
+#         flash(f"Sorry, only {username} may access this page.")
+#         return redirect("/")
+
+#     else:
+#         return render_template("user_details.html", user=user, form=form)
