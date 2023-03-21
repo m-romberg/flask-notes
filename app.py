@@ -5,7 +5,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 
 
 from models import db, connect_db, User
-from forms import RegisterUserForm, LoginForm
+from forms import RegisterUserForm, LoginForm, CSRFProtectForm
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -58,7 +58,7 @@ def register_new_user():
         session["username"] = user.username
         flash(f"Thanks, {user.first_name}!")
 
-        return redirect('/secret')
+        return redirect(f'/users/{user.username}')
 
     else:
         return render_template("register_user_form.html", form=form)
@@ -71,7 +71,8 @@ def login():
     form = LoginForm()
 
     if "username" in session:
-        return redirect('/secret')
+        username = session["username"]
+        return redirect(f'/users/{username}')
 
     if form.validate_on_submit():
         username = form.username.data
@@ -83,7 +84,7 @@ def login():
             session["username"] = user.username
 
             flash(f"Welcome back, {user.first_name}!")
-            return redirect('/secret')
+            return redirect(f'/users/{user.username}')
         else:
             form.username.errors = ["Invalid username/password combination."]
             return render_template("login.html", form=form)
@@ -94,6 +95,9 @@ def login():
 
 @app.get('/users/<username>')
 def display_user(username):
+    """Display the user detail page if user is logged in or redirect to root"""
+
+    form = CSRFProtectForm()
 
     user = User.query.get_or_404(username)
 
@@ -102,4 +106,15 @@ def display_user(username):
         return redirect("/")
 
     else:
-        return render_template("user_details.html", user=user)
+        return render_template("user_details.html", user=user, form=form)
+
+@app.post('/logout')
+def logout():
+    """Log out a user"""
+
+    form = CSRFProtectForm()
+
+    if form.validate_on_submit():
+        session.pop("username", None)
+
+    return redirect("/")
