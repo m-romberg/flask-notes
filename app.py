@@ -4,7 +4,6 @@ from flask import Flask, request, redirect, render_template, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
 
 
-
 from models import db, connect_db, User
 from forms import RegisterUserForm, LoginForm
 
@@ -24,11 +23,13 @@ connect_db(app)
 
 debug = DebugToolbarExtension(app)
 
+
 @app.get("/")
 def root():
     """On root, redirect to register"""
 
-    return redirect ("/register")
+    return redirect("/register")
+
 
 @app.route("/register", methods=["GET", "POST"])
 def register_new_user():
@@ -70,7 +71,7 @@ def login():
     form = LoginForm()
 
     if "username" in session:
-        return redirect ('/secret')
+        return redirect('/secret')
 
     if form.validate_on_submit():
         username = form.username.data
@@ -102,7 +103,3 @@ def display_user(username):
 
     else:
         return render_template("user_details.html", user=user)
-
-
-
-
