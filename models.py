@@ -45,6 +45,7 @@ class User(db.Model):
         db.String(30),
         nullable=False
     )
+    notes = db.relationship("Note", backref="user")
 
     @classmethod
     def register(cls, username, password, email, first_name, last_name):
@@ -83,7 +84,9 @@ class User(db.Model):
         return f"{self.first_name} {self.last_name}"
 
 class Note(db.Model):
-    """Note."""
+    """Note.
+    Note to user: backref="user"
+    """
 
     __tablename__ = "notes"
 

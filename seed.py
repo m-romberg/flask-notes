@@ -1,4 +1,4 @@
-from models import User, db, bcrypt
+from models import User, Note, db, bcrypt
 from app import app
 
 db.drop_all()
@@ -20,7 +20,20 @@ tom = User.register(
     last_name='Frommyspace'
 )
 
+n1 = Note(
+    title="Chores",
+    content="Clean room, laundry",
+    owner="User1"
+)
+
+n2 = Note(
+    title="Homework",
+    content="Math",
+    owner="User2"
+)
+
 db.session.add(joel)
 db.session.add(tom)
+db.session.add_all([n1, n2])
 
 db.session.commit()

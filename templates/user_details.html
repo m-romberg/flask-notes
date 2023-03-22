@@ -10,7 +10,22 @@
 
 <form action="/logout" method="POST">
   {% include "_form.html" %}
-  <button class="btn btn-danger" type="submit">Logout</button>
+  <button class="btn btn-info" type="submit">Logout</button>
 </form>
+
+<h3>Notes</h3>
+<ul>
+  {% for note in user.notes %}
+  <li>
+    <b>{{note.title}}</b> {{note.content}}
+  </li>
+  {% endfor %}
+</ul>
+
+<form action="/users/{{user.username}}/delete" method="POST">
+  {% include "_form.html" %}
+  <button class="btn btn-danger" type="submit">Delete</button>
+</form>
+
 
 {% endblock %}

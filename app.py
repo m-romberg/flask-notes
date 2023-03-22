@@ -5,7 +5,7 @@ from werkzeug.exceptions import Unauthorized
 from flask_debugtoolbar import DebugToolbarExtension
 
 
-from models import db, connect_db, User
+from models import db, connect_db, User, Note
 from forms import RegisterUserForm, LoginForm, CSRFProtectForm
 
 from dotenv import load_dotenv
@@ -94,20 +94,20 @@ def login():
         return render_template("login.html", form=form)
 
 
-@app.get('/users/<username>')
-def display_user(username):
-    """Display the user detail page if user is logged in or redirect to root"""
+# @app.get('/users/<username>')
+# def display_user(username):
+#     """Display the user detail page if user is logged in or redirect to root"""
 
 
-    if "username" not in session or session['username'] != username:
-        flash(f"Sorry, only {username} may access this page.")
-        #TODO: raise unauthorized() instead of flashing and redirecting
-        return redirect("/")
+#     if "username" not in session or session['username'] != username:
+#         flash(f"Sorry, only {username} may access this page.")
+#         #TODO: raise unauthorized() instead of flashing and redirecting
+#         return redirect("/")
 
-    form = CSRFProtectForm()
-    user = User.query.get_or_404(username)
+#     form = CSRFProtectForm()
+#     user = User.query.get_or_404(username)
 
-    return render_template("user_details.html", user=user, form=form)
+#     return render_template("user_details.html", user=user, form=form)
 
 @app.post('/logout')
 def logout():
@@ -126,17 +126,37 @@ def logout():
 
 ###################################Notes Routes#################################
 
-# @app.get('/users/<username>')
-# def display_user(username):
-#     """Display the user detail page if user is logged in or redirect to root"""
+@app.get('/users/<username>')
+def display_user(username):
+    """Display the user detail page if user is logged in or redirect to root"""
 
-#     form = CSRFProtectForm()
 
-#     user = User.query.get_or_404(username)
+    if "username" not in session or session['username'] != username:
+        raise Unauthorized()
 
-#     if "username" not in session or session['username'] != username:
-#         flash(f"Sorry, only {username} may access this page.")
-#         return redirect("/")
+    form = CSRFProtectForm()
+    user = User.query.get_or_404(username)
 
-#     else:
-#         return render_template("user_details.html", user=user, form=form)
+    return render_template("user_details.html", user=user, form=form)
+
+@app.post('/users/<username>/delete')
+def delete_user(username):
+    """Delete the user and all notes."""
+
+    if "username" not in session or session['username'] != username:
+        raise Unauthorized()
+
+    form = CSRFProtectForm()
+
+    if form.validate_on_submit():
+        #find the user via query
+        user = User.query.get_or_404(username)
+        #delete all matching notes
+        Note.query.filter(Note.owner==user.username).delete()
+        db.session.delete(user)
+        db.session.commit()
+
+        session.pop("username", None)
+        return redirect("/")
+    else:
+        raise Unauthorized()
